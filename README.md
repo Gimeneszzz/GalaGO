@@ -42,9 +42,15 @@ sudo apt-get install -y libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev l
 
 ## MVP implementado
 
+- Tela horizontal `960x540` em proporcao 16:9.
 - Nave do jogador com movimento lateral por `A/D` ou setas.
-- Disparo com `Espaco`.
+- Disparo continuo com `Espaco` e pequeno intervalo entre tiros.
 - Meteoros aleatorios surgindo no topo da tela como obstaculos/inimigos.
+- Meteoros pequenos, medios e grandes precisam de 1, 2 e 3 tiros.
+- Colisao com meteoros, sistema de 3 vidas e invulnerabilidade temporaria.
+- Pontuacao com multiplicador progressivo de `x01` ate `x10`.
+- Penalidade de `-1000`, `-2000` ou `-3000` quando um meteoro escapa.
+- Tela de game over e reinicio com a tecla `R`.
 - Fundo simples com estrelas e planetas.
 - Sprites carregados por `go:embed` a partir da pasta `assets/`.
 - Placeholder automatico para meteoros caso a pasta seja removida sem querer.

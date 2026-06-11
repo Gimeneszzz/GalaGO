@@ -17,7 +17,7 @@ func main() {
 	// objeto passado para RunGame. Por isso, a maior parte do jogo fica em
 	// internal/game, e nao espalhada no main.go.
 	ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
-	ebiten.SetWindowTitle("GalaGO - MVP")
+	ebiten.SetWindowTitle("GalaGO")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	g, err := game.New()

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
 	"galago/internal/assets"
@@ -30,6 +29,15 @@ type Game struct {
 
 	rng            *rand.Rand
 	lastEnemySpawn time.Time
+	shootCooldown  int
+
+	score      int
+	lives      int
+	multiplier int
+	gameOver   bool
+
+	penaltyValue int
+	penaltyTicks int
 }
 
 func New() (*Game, error) {
@@ -44,30 +52,38 @@ func New() (*Game, error) {
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	return &Game{
-		images:         images,
-		player:         entities.NewPlayer(images.Player),
-		bullets:        make([]entities.Bullet, 0, 16),
-		enemies:        make([]entities.Enemy, 0, 16),
-		background:     createBackground(images, rng),
-		rng:            rng,
-		lastEnemySpawn: time.Now(),
-	}, nil
+	g := &Game{
+		images:     images,
+		background: createBackground(images, rng),
+		rng:        rng,
+	}
+	g.reset()
+	return g, nil
 }
 
 func (g *Game) Update() error {
+	g.updateBackground()
+	g.updatePenaltyMessage()
+
+	if g.gameOver {
+		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
+			g.reset()
+		}
+		return nil
+	}
+
 	g.player.Update()
 	g.handleShooting()
 	g.spawnEnemies()
-	g.updateBackground()
 	g.updateBullets()
 	g.updateEnemies()
+	g.handleCollisions()
+	g.removeEscapedEnemies()
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
 	screen.Fill(color.RGBA{R: 8, G: 10, B: 20, A: 255})
 
 	for _, object := range g.background {
@@ -80,26 +96,26 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		enemy.Draw(screen)
 	}
 	g.player.Draw(screen)
-
-	
-	ebitenutil.DebugPrint(screen, "Mover: A/D ou Setas | Atirar: Espaco")
+	g.drawHUD(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	
 	return config.ScreenWidth, config.ScreenHeight
 }
 
 func (g *Game) handleShooting() {
-	// IsKeyPressed seria verdadeiro enquanto a tecla estivesse segurada, criando
-	// tiros em todos os frames. IsKeyJustPressed dispara somente no frame em que
-	// a tecla acabou de ser pressionada, que e o comportamento esperado aqui.
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	if g.shootCooldown > 0 {
+		g.shootCooldown--
+	}
+
+	// O pequeno cooldown permite segurar Espaco sem criar 60 tiros por segundo.
+	if ebiten.IsKeyPressed(ebiten.KeySpace) && g.shootCooldown == 0 {
 		g.bullets = append(g.bullets, entities.NewBullet(
 			g.player.CenterX(),
 			g.player.Y-12,
 			g.images.Bullet,
 		))
+		g.shootCooldown = config.ShootCooldownTicks
 	}
 }
 
@@ -139,20 +155,53 @@ func (g *Game) updateBullets() {
 }
 
 func (g *Game) updateEnemies() {
-	alive := g.enemies[:0]
 	for i := range g.enemies {
 		g.enemies[i].Update()
-		if !g.enemies[i].IsOffScreen() {
-			alive = append(alive, g.enemies[i])
-		}
 	}
-	g.enemies = alive
+}
+
+func (g *Game) removeEscapedEnemies() {
+	remaining := g.enemies[:0]
+	for _, enemy := range g.enemies {
+		if enemy.IsOffScreen() {
+			g.score -= enemy.EscapePenalty
+			g.showPenalty(enemy.EscapePenalty)
+			continue
+		}
+		remaining = append(remaining, enemy)
+	}
+	g.enemies = remaining
+}
+
+func (g *Game) updatePenaltyMessage() {
+	if g.penaltyTicks > 0 {
+		g.penaltyTicks--
+	}
+}
+
+func (g *Game) showPenalty(value int) {
+	g.penaltyValue = value
+	g.penaltyTicks = config.PenaltyMessageTicks
+}
+
+func (g *Game) reset() {
+	g.player = entities.NewPlayer(g.images.Player)
+	g.bullets = make([]entities.Bullet, 0, 24)
+	g.enemies = make([]entities.Enemy, 0, 24)
+	g.lastEnemySpawn = time.Now()
+	g.shootCooldown = 0
+	g.score = 0
+	g.lives = config.InitialLives
+	g.multiplier = 1
+	g.gameOver = false
+	g.penaltyValue = 0
+	g.penaltyTicks = 0
 }
 
 func createBackground(images assets.Images, rng *rand.Rand) []entities.BackgroundObject {
 	objects := make([]entities.BackgroundObject, 0, 10)
 
-	// Estrelas pequenas se movem devagar para dar sensacao de profundidade 
+	// Estrelas pequenas se movem devagar para dar sensacao de profundidade
 	for i := 0; i < 8 && len(images.Stars) > 0; i++ {
 		sprite := images.Stars[rng.Intn(len(images.Stars))]
 		width, height := sprite.Size()

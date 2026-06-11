@@ -1,10 +1,13 @@
 package assets
 
 import (
+	"bytes"
+	"fmt"
 	"image/color"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 
 	rawassets "galago/assets"
 )
@@ -16,12 +19,18 @@ type Images struct {
 	Meteors []*ebiten.Image
 	Stars   []*ebiten.Image
 	Planets []*ebiten.Image
+	UIFont  *text.GoTextFaceSource
 }
 
 // LoadImages organiza os sprites carregados pelo pacote galago/assets.
 
 func LoadImages() (Images, []string, error) {
 	var warnings []string
+
+	uiFont, err := text.NewGoTextFaceSource(bytes.NewReader(rawassets.UIFontData))
+	if err != nil {
+		return Images{}, nil, fmt.Errorf("nao foi possivel carregar fontui.ttf: %w", err)
+	}
 
 	meteors := rawassets.MeteorSprites
 	if len(meteors) == 0 {
@@ -38,6 +47,7 @@ func LoadImages() (Images, []string, error) {
 		Meteors: meteors,
 		Stars:   rawassets.StarsSprites,
 		Planets: rawassets.PlanetsSprites,
+		UIFont:  uiFont,
 	}, warnings, nil
 }
 

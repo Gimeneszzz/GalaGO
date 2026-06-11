@@ -40,3 +40,15 @@ func (b Bullet) Draw(screen *ebiten.Image) {
 func (b Bullet) IsOffScreen() bool {
 	return b.Y+b.Height < 0
 }
+
+func (b Bullet) CenterX() float64 {
+	return b.X + b.Width/2
+}
+
+func (b Bullet) CenterY() float64 {
+	return b.Y + b.Height/2
+}
+
+func (b Bullet) Radius() float64 {
+	return b.Width / 2
+}
