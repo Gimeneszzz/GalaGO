@@ -62,6 +62,12 @@ func New() (*Game, error) {
 }
 
 func (g *Game) Update() error {
+	// Retornar ebiten.Termination encerra o jogo de forma limpa, sem fazer o
+	// RunGame tratar a saida solicitada pelo jogador como um erro.
+	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		return ebiten.Termination
+	}
+
 	g.updateBackground()
 	g.updatePenaltyMessage()
 
@@ -128,13 +134,25 @@ func (g *Game) spawnEnemies() {
 
 	sprite := g.images.Meteors[g.rng.Intn(len(g.images.Meteors))]
 	enemyWidth, enemyHeight := sprite.Size()
-	maxX := config.ScreenWidth - enemyWidth
-	x := float64(g.rng.Intn(maxX + 1))
+	minX, maxX := meteorSpawnBounds(enemyWidth)
+	x := float64(minX + g.rng.Intn(maxX-minX+1))
 	y := -float64(enemyHeight)
 	speed := config.EnemySpeed + g.rng.Float64()*85
 	rotationSpeed := (g.rng.Float64()*2 - 1) * 1.4
 
 	g.enemies = append(g.enemies, entities.NewEnemy(x, y, speed, rotationSpeed, sprite))
+}
+
+func meteorSpawnBounds(meteorWidth int) (minX, maxX int) {
+	minX = config.SpawnSideMargin
+	maxX = config.ScreenWidth - config.SpawnSideMargin - meteorWidth
+
+	// Esta protecao mantem o calculo valido caso uma sprite futura seja maior
+	// do que toda a area disponivel entre as margens.
+	if maxX < minX {
+		maxX = minX
+	}
+	return minX, maxX
 }
 
 func (g *Game) updateBackground() {
@@ -165,6 +183,7 @@ func (g *Game) removeEscapedEnemies() {
 	for _, enemy := range g.enemies {
 		if enemy.IsOffScreen() {
 			g.score -= enemy.EscapePenalty
+			g.multiplier = 1
 			g.showPenalty(enemy.EscapePenalty)
 			continue
 		}
