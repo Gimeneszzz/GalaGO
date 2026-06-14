@@ -18,24 +18,24 @@ type ProfessorShip struct {
 	Sprite      *ebiten.Image
 }
 
-func NewProfessorShip(sprite *ebiten.Image, player *Player) *ProfessorShip {
+func NewProfessorShip(sprite *ebiten.Image, player *Player, health int) *ProfessorShip {
 	width, height := sprite.Size()
 	ship := &ProfessorShip{
 		Width:     float64(width),
 		Height:    float64(height),
-		Health:    config.ProfessorShipHealth,
-		MaxHealth: config.ProfessorShipHealth,
+		Health:    health,
+		MaxHealth: health,
 		Reward:    config.ProfessorShipReward,
 		Sprite:    sprite,
 	}
 	ship.X = player.CenterX() - ship.Width/2
-	ship.Y = professorShipTargetY(player, ship.Height)
+	ship.Y = -ship.Height
 	return ship
 }
 
-func (ship *ProfessorShip) Update(player *Player) {
+func (ship *ProfessorShip) Update(player *Player, followSpeed, entrySpeed float64) {
 	targetX := player.CenterX() - ship.Width/2
-	step := config.ProfessorShipFollowSpeed * config.DeltaTime
+	step := followSpeed * config.DeltaTime
 	if ship.X < targetX {
 		ship.X = min(ship.X+step, targetX)
 	}
@@ -43,7 +43,14 @@ func (ship *ProfessorShip) Update(player *Player) {
 		ship.X = max(ship.X-step, targetX)
 	}
 
-	ship.Y = professorShipTargetY(player, ship.Height)
+	targetY := professorShipTargetY(player, ship.Height)
+	verticalStep := entrySpeed * config.DeltaTime
+	if ship.Y < targetY {
+		ship.Y = min(ship.Y+verticalStep, targetY)
+	}
+	if ship.Y > targetY {
+		ship.Y = max(ship.Y-verticalStep, targetY)
+	}
 
 	if ship.X < 0 {
 		ship.X = 0
@@ -54,6 +61,10 @@ func (ship *ProfessorShip) Update(player *Player) {
 	if ship.DamageTicks > 0 {
 		ship.DamageTicks--
 	}
+}
+
+func (ship ProfessorShip) IsReady(player *Player) bool {
+	return ship.Y >= professorShipTargetY(player, ship.Height)-1
 }
 
 func (ship ProfessorShip) Draw(screen *ebiten.Image) {

@@ -18,17 +18,25 @@ const (
 	EnemySpawnMs    = 750
 	SpawnSideMargin = 20
 
-	ProfessorShipFollowSpeed      = 280.0
+	ProfessorShipFollowSpeed      = 300.0
+	ProfessorShipFollowPerVisit   = 34.0
+	ProfessorShipEntrySpeed       = 210.0
+	ProfessorShipEntryPerVisit    = 24.0
 	ProfessorShipVerticalDistance = 235.0
 	ProfessorShipSpawnDelayTicks  = 420
 	ProfessorShipActiveTicks      = 720
 	ProfessorShipRespawnTicks     = 600
+	ProfessorShipWarningTicks     = 120
+	ProfessorShipChargeTicks      = 34
 	ProfessorShipShootMinTicks    = 38
 	ProfessorShipShootMaxTicks    = 76
-	ProfessorProjectileSpeed      = 240.0
+	ProfessorProjectileSpeed      = 270.0
 	ProfessorProjectileSpread     = 0.55
-	ProfessorShipReward           = 1200
-	ProfessorShipHealth           = 10
+	ProfessorShipReward           = 10000
+	ProfessorShipHealth           = 24
+	ProfessorShipHealthPerVisit   = 10
+	ProfessorShipMaxVisitLevel    = 10
+	ProfessorDefeatsToWin         = 4
 
 	InitialLives  = 3
 	MaxMultiplier = 10
@@ -38,6 +46,12 @@ const (
 	InvulnerabilityTicks   = 90
 	MeteorDamageFlashTicks = 8
 	PenaltyMessageTicks    = 60
+
+	ProfessorRewardMessageTicks = 100
+	ProfessorDefeatPauseTicks   = 36
+	PowerUpSpeed                = 115.0
+	PowerUpDurationTicks        = 600
+	PowerUpDropChance           = 0.18
 
 	// Recompensas por destruir meteoros
 	SmallMeteorReward  = 100
