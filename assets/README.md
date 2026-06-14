@@ -10,4 +10,3 @@ Os sprites atuais sao carregados pelo arquivo `assets.go` dessa pasta usando `go
 - Estrelas de fundo: `stars/*.png`
 - Planetas de fundo: `planets/*.png`
 
-
