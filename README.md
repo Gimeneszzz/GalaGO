@@ -43,6 +43,7 @@ sudo apt-get install -y libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev l
 ## MVP implementado
 
 - Tela `800x600`.
+- Menu inicial com `Enter` para comecar e comandos na tela.
 - Nave do jogador com movimento lateral por `A/D` ou setas.
 - Disparo continuo com `Espaco` e pequeno intervalo entre tiros.
 - Meteoros aleatorios surgindo no topo da tela como obstaculos/inimigos.
@@ -56,6 +57,29 @@ sudo apt-get install -y libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev l
 - Fundo simples com estrelas e planetas.
 - Sprites carregados por `go:embed` a partir da pasta `assets/`.
 - Placeholder automatico para meteoros caso a pasta seja removida sem querer.
+
+## Colocar o rosto do professor nos planetas
+
+Coloque uma imagem PNG do professor em `assets/professor.png` e rode o jogo
+normalmente:
+
+```bash
+go run .
+```
+
+Se esse arquivo existir, o jogo aplica automaticamente o rosto em formato
+circular nos planetas do fundo. Se o arquivo nao existir, os planetas continuam
+aparecendo com as sprites originais.
+
+## Adicionar a nave do professor
+
+Coloque a sprite da nave do professor em `assets/professornave.png`. Quando esse
+arquivo existir, uma nave especial aparece alguns segundos depois do inicio da
+partida e volta de tempos em tempos. Ela fica acima da nave do jogador,
+acompanha o movimento horizontal, pode ser atingida pelos tiros do jogador e
+dispara lasers em direcoes levemente aleatorias tentando acertar o jogador. Se a
+imagem vier com fundo branco ou margem grande, o jogo remove esse fundo, recorta
+a nave e reduz o sprite automaticamente.
 
 ## Proximos passos
 

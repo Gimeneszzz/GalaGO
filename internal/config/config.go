@@ -18,6 +18,18 @@ const (
 	EnemySpawnMs    = 750
 	SpawnSideMargin = 20
 
+	ProfessorShipFollowSpeed      = 280.0
+	ProfessorShipVerticalDistance = 235.0
+	ProfessorShipSpawnDelayTicks  = 420
+	ProfessorShipActiveTicks      = 720
+	ProfessorShipRespawnTicks     = 600
+	ProfessorShipShootMinTicks    = 38
+	ProfessorShipShootMaxTicks    = 76
+	ProfessorProjectileSpeed      = 240.0
+	ProfessorProjectileSpread     = 0.55
+	ProfessorShipReward           = 1200
+	ProfessorShipHealth           = 10
+
 	InitialLives  = 3
 	MaxMultiplier = 10
 
@@ -33,7 +45,7 @@ const (
 	LargeMeteorReward  = 300
 
 	// Penalidades por deixar meteoros escaparem
-	SmallMeteorEscapePenalty  = 100
-	MediumMeteorEscapePenalty = 200
-	LargeMeteorEscapePenalty  = 300
+	SmallMeteorEscapePenalty  = 1000
+	MediumMeteorEscapePenalty = 2000
+	LargeMeteorEscapePenalty  = 3000
 )

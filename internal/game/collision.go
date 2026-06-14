@@ -10,6 +10,33 @@ import (
 func (g *Game) handleCollisions() {
 	removedBullets := make([]bool, len(g.bullets))
 	removedEnemies := make([]bool, len(g.enemies))
+	removedProfessorProjectiles := make([]bool, len(g.professorProjectiles))
+
+	if g.professorShip != nil {
+		for bulletIndex := range g.bullets {
+			if removedBullets[bulletIndex] {
+				continue
+			}
+
+			bullet := g.bullets[bulletIndex]
+			if !circlesOverlap(
+				bullet.CenterX(), bullet.CenterY(), bullet.Radius(),
+				g.professorShip.CenterX(), g.professorShip.CenterY(), g.professorShip.Radius(),
+			) {
+				continue
+			}
+
+			removedBullets[bulletIndex] = true
+			if g.professorShip.TakeDamage() {
+				g.score += g.professorShip.Reward * g.multiplier
+				if g.multiplier < config.MaxMultiplier {
+					g.multiplier++
+				}
+				g.scheduleProfessorRespawn()
+				break
+			}
+		}
+	}
 
 	for bulletIndex := range g.bullets {
 		for enemyIndex := range g.enemies {
@@ -38,7 +65,34 @@ func (g *Game) handleCollisions() {
 	}
 
 	if !g.player.IsInvulnerable() {
+		if g.professorShip != nil && circlesOverlap(
+			g.player.CenterX(), g.player.CenterY(), g.player.Radius(),
+			g.professorShip.CenterX(), g.professorShip.CenterY(), g.professorShip.Radius(),
+		) {
+			g.damagePlayer()
+		}
+
+		for projectileIndex := range g.professorProjectiles {
+			if g.player.IsInvulnerable() {
+				break
+			}
+
+			projectile := g.professorProjectiles[projectileIndex]
+			if !circlesOverlap(
+				g.player.CenterX(), g.player.CenterY(), g.player.Radius(),
+				projectile.CenterX(), projectile.CenterY(), projectile.Radius(),
+			) {
+				continue
+			}
+
+			removedProfessorProjectiles[projectileIndex] = true
+			g.damagePlayer()
+		}
+
 		for enemyIndex := range g.enemies {
+			if g.player.IsInvulnerable() {
+				break
+			}
 			if removedEnemies[enemyIndex] {
 				continue
 			}
@@ -52,19 +106,23 @@ func (g *Game) handleCollisions() {
 			}
 
 			removedEnemies[enemyIndex] = true
-			g.lives--
-			g.multiplier = 1
-			g.player.TakeDamage()
-			if g.lives <= 0 {
-				g.lives = 0
-				g.gameOver = true
-			}
-			break
+			g.damagePlayer()
 		}
 	}
 
 	g.bullets = keepBullets(g.bullets, removedBullets)
 	g.enemies = keepEnemies(g.enemies, removedEnemies)
+	g.professorProjectiles = keepProfessorProjectiles(g.professorProjectiles, removedProfessorProjectiles)
+}
+
+func (g *Game) damagePlayer() {
+	g.lives--
+	g.multiplier = 1
+	g.player.TakeDamage()
+	if g.lives <= 0 {
+		g.lives = 0
+		g.gameOver = true
+	}
 }
 
 func circlesOverlap(ax, ay, ar, bx, by, br float64) bool {
@@ -85,6 +143,16 @@ func keepBullets(items []entities.Bullet, removed []bool) []entities.Bullet {
 }
 
 func keepEnemies(items []entities.Enemy, removed []bool) []entities.Enemy {
+	remaining := items[:0]
+	for i, item := range items {
+		if !removed[i] {
+			remaining = append(remaining, item)
+		}
+	}
+	return remaining
+}
+
+func keepProfessorProjectiles(items []entities.ProfessorProjectile, removed []bool) []entities.ProfessorProjectile {
 	remaining := items[:0]
 	for i, item := range items {
 		if !removed[i] {

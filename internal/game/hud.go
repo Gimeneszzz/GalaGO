@@ -33,13 +33,25 @@ func (g *Game) drawHUD(screen *ebiten.Image) {
 	}
 
 	if g.gameOver {
-		titleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 58}
+		titleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 38}
 		subtitleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 24}
 		centerX := float64(config.ScreenWidth) / 2
 
-		drawText(screen, "GAME OVER", titleFace, centerX, 205, text.AlignCenter, color.RGBA{R: 255, G: 80, B: 80, A: 255})
+		drawText(screen, "Você foi derrotado por Berri", titleFace, centerX, 205, text.AlignCenter, color.RGBA{R: 255, G: 80, B: 80, A: 255})
 		drawText(screen, "Pressione R para reiniciar", subtitleFace, centerX, 280, text.AlignCenter, color.White)
 	}
+}
+
+func (g *Game) drawStartScreen(screen *ebiten.Image) {
+	titleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 54}
+	subtitleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 24}
+	controlsFace := &text.GoTextFace{Source: g.images.UIFont, Size: 18}
+	centerX := float64(config.ScreenWidth) / 2
+
+	drawText(screen, "GalaGO", titleFace, centerX, 178, text.AlignCenter, color.RGBA{R: 80, G: 210, B: 255, A: 255})
+	drawText(screen, "Pressione Enter para iniciar o jogo", subtitleFace, centerX, 250, text.AlignCenter, color.White)
+	drawText(screen, "Setas ou A/D: mover para os lados", controlsFace, centerX, 318, text.AlignCenter, color.RGBA{R: 210, G: 225, B: 240, A: 255})
+	drawText(screen, "Espaco: atirar", controlsFace, centerX, 348, text.AlignCenter, color.RGBA{R: 210, G: 225, B: 240, A: 255})
 }
 
 func drawText(screen *ebiten.Image, value string, face text.Face, x, y float64, align text.Align, clr color.Color) {
