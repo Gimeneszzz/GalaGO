@@ -14,12 +14,13 @@ import (
 
 // Guardar os sprites em uma unica estrutura facilita trocar a origem dos assets
 type Images struct {
-	Player  *ebiten.Image
-	Bullet  *ebiten.Image
-	Meteors []*ebiten.Image
-	Stars   []*ebiten.Image
-	Planets []*ebiten.Image
-	UIFont  *text.GoTextFaceSource
+	Player        *ebiten.Image
+	Bullet        *ebiten.Image
+	Meteors       []*ebiten.Image
+	Stars         []*ebiten.Image
+	Planets       []*ebiten.Image
+	ProfessorShip *ebiten.Image
+	UIFont        *text.GoTextFaceSource
 }
 
 // LoadImages organiza os sprites carregados pelo pacote galago/assets.
@@ -42,12 +43,13 @@ func LoadImages() (Images, []string, error) {
 	}
 
 	return Images{
-		Player:  rawassets.PlayerSprite,
-		Bullet:  rawassets.LaserSprite,
-		Meteors: meteors,
-		Stars:   rawassets.StarsSprites,
-		Planets: rawassets.PlanetsSprites,
-		UIFont:  uiFont,
+		Player:        rawassets.PlayerSprite,
+		Bullet:        rawassets.LaserSprite,
+		Meteors:       meteors,
+		Stars:         rawassets.StarsSprites,
+		Planets:       rawassets.PlanetsSprites,
+		ProfessorShip: rawassets.ProfessorShipSprite,
+		UIFont:        uiFont,
 	}, warnings, nil
 }
 
