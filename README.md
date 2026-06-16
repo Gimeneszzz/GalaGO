@@ -43,13 +43,15 @@ sudo apt-get install -y libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev l
 ## Funcionalidades
 
 - Menu inicial com comandos na tela.
+- Menu de seleção de naves
 - Nave do jogador com movimento lateral e disparo contínuo.
+- Nave de jogador com movimentos laterais, tiros duplos e mais vida.
 - Meteoros aleatórios com tamanhos e resistências diferentes.
 - Sistema de vidas, invulnerabilidade temporária e pontuação com multiplicador.
 - Penalidade de pontos quando meteoros escapam.
 - Chefe Berri com aparições periódicas, barra de vida e dificuldade progressiva.
 - Ataques carregados, tiros em padrões variados e explosões.
-- Power-ups temporários de tiro duplo e escudo.
+- Power-ups temporários de tiro máximo e escudo.
 - Meteoros grandes podem quebrar em fragmentos menores.
 - Tela de derrota, tela de vitória, pontuação final, rank e recorde local.
 - Efeitos sonoros, música ambiente e opção de mutar o som.
