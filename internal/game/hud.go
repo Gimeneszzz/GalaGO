@@ -106,8 +106,8 @@ func (g *Game) drawProfessorSpawnProgress(screen *ebiten.Image) {
 func (g *Game) drawPowerUpStatus(screen *ebiten.Image) {
 	statusFace := &text.GoTextFace{Source: g.images.UIFont, Size: 18}
 	y := 82.0
-	if g.doubleShotTicks > 0 {
-		drawText(screen, fmt.Sprintf("Tiro duplo %.0fs", float64(g.doubleShotTicks)*config.DeltaTime), statusFace, 24, y, text.AlignStart, color.RGBA{R: 80, G: 210, B: 255, A: 255})
+	if g.specialShotTicks > 0 {
+		drawText(screen, fmt.Sprintf("Tiro Máximo %.0fs", float64(g.specialShotTicks)*config.DeltaTime), statusFace, 24, y, text.AlignStart, color.RGBA{R: 80, G: 210, B: 255, A: 255})
 		y += 24
 	}
 	if g.shieldTicks > 0 {
@@ -140,6 +140,36 @@ func (g *Game) drawStartScreen(screen *ebiten.Image) {
 	width, _ := g.images.Player.Size()
 	options := &ebiten.DrawImageOptions{}
 	options.GeoM.Translate(centerX-float64(width)/2, 450)
+	screen.DrawImage(g.images.Player, options)
+}
+
+func (g *Game) drawShipSelectionScreen(screen *ebiten.Image) {
+	titleFace := &text.GoTextFace{Source: g.images.UIFont, Size: 46}
+	shipFace := &text.GoTextFace{Source: g.images.UIFont, Size: 30}
+	descFace := &text.GoTextFace{Source: g.images.UIFont, Size: 22}
+	controlsFace := &text.GoTextFace{Source: g.images.UIFont, Size: 18}
+
+	centerX := float64(config.ScreenWidth) / 2
+
+	shipName := "NAVE PADRAO"
+	description := "3 vidas | tiro simples"
+
+	if g.shipSelectIndex == ShipDouble {
+		shipName = "NAVE DUPLA"
+		description = "5 vidas | tiro duplo vertical"
+	}
+
+	drawText(screen, "ESCOLHA SUA NAVE", titleFace, centerX, 135, text.AlignCenter, color.RGBA{R: 80, G: 210, B: 255, A: 255})
+	drawText(screen, "<  "+shipName+"  >", shipFace, centerX, 235, text.AlignCenter, color.White)
+	drawText(screen, description, descFace, centerX, 285, text.AlignCenter, color.RGBA{R: 210, G: 225, B: 240, A: 255})
+
+	drawText(screen, "Use <  > para trocar de nave", controlsFace, centerX, 390, text.AlignCenter, color.RGBA{R: 210, G: 225, B: 240, A: 255})
+	drawText(screen, "Pressione ENTER para confirmar", controlsFace, centerX, 420, text.AlignCenter, color.White)
+	drawText(screen, "Pressione Q para sair", controlsFace, centerX, 450, text.AlignCenter, color.RGBA{R: 210, G: 225, B: 240, A: 255})
+
+	width, _ := g.images.Player.Size()
+	options := &ebiten.DrawImageOptions{}
+	options.GeoM.Translate(centerX-float64(width)/2, 500)
 	screen.DrawImage(g.images.Player, options)
 }
 

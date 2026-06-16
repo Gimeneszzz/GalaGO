@@ -214,8 +214,8 @@ func (g *Game) randomSmallMeteorSprite() *ebiten.Image {
 func (g *Game) collectPowerUp(kind entities.PowerUpKind) {
 	switch kind {
 	case entities.PowerUpDoubleShot:
-		g.doubleShotTicks = config.PowerUpDurationTicks
-		g.addFloatingText(g.player.CenterX(), g.player.Y-24, "Tiro duplo!", color.RGBA{R: 80, G: 210, B: 255, A: 255})
+		g.specialShotTicks = config.PowerUpDurationTicks
+		g.addFloatingText(g.player.CenterX(), g.player.Y-24, "Tiro Máximo!", color.RGBA{R: 80, G: 210, B: 255, A: 255})
 	case entities.PowerUpShield:
 		g.shieldTicks = config.PowerUpDurationTicks
 		g.addFloatingText(g.player.CenterX(), g.player.Y-24, "Escudo!", color.RGBA{R: 100, G: 245, B: 145, A: 255})

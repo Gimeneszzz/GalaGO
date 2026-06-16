@@ -21,6 +21,12 @@ import (
 // - Update: atualiza regras, fisica simples e inputs.
 // - Draw: desenha o frame atual.
 // - Layout: informa a resolucao logica usada pelo jogo.
+
+const (
+	ShipDefault = iota
+	ShipDouble
+)
+
 type Game struct {
 	images               assets.Images
 	sounds               *soundPlayer
@@ -33,6 +39,10 @@ type Game struct {
 	explosions           []entities.Explosion
 	floatingTexts        []floatingText
 	background           []entities.BackgroundObject
+
+	selectedShip    int
+	shipSelectIndex int
+	selectingShip   bool
 
 	rng                      *rand.Rand
 	lastEnemySpawn           time.Time
@@ -58,6 +68,7 @@ type Game struct {
 	professorDefeats int
 	professorVisits  int
 	doubleShotTicks  int
+	specialShotTicks int
 	shieldTicks      int
 
 	penaltyValue       int
@@ -106,10 +117,33 @@ func (g *Game) Update() error {
 	g.updateScreenFlash()
 
 	if !g.started {
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			g.reset()
-			g.started = true
+
+		if !g.selectingShip {
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+				g.selectingShip = true
+			}
+			return nil
 		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyLeft) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+
+			if g.shipSelectIndex == ShipDefault {
+				g.shipSelectIndex = ShipDouble
+			} else {
+				g.shipSelectIndex = ShipDefault
+			}
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+
+			g.selectedShip = g.shipSelectIndex
+
+			g.reset()
+
+			g.started = true
+			g.selectingShip = false
+		}
+
 		return nil
 	}
 
@@ -160,7 +194,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if !g.started {
-		g.drawStartScreen(screen)
+		if g.selectingShip {
+			g.drawShipSelectionScreen(screen)
+		} else {
+			g.drawStartScreen(screen)
+		}
 		return
 	}
 
@@ -218,7 +256,18 @@ func (g *Game) handleShooting() {
 }
 
 func (g *Game) spawnPlayerBullets() {
-	if g.doubleShotTicks > 0 {
+	if g.specialShotTicks > 0 {
+		g.bullets = append(g.bullets,
+			entities.NewBullet(g.player.CenterX()-30, g.player.Y-12, g.images.Bullet),
+			entities.NewBullet(g.player.CenterX()-15, g.player.Y-12, g.images.Bullet),
+			entities.NewBullet(g.player.CenterX(), g.player.Y-12, g.images.Bullet),
+			entities.NewBullet(g.player.CenterX()+15, g.player.Y-12, g.images.Bullet),
+			entities.NewBullet(g.player.CenterX()+30, g.player.Y-12, g.images.Bullet),
+		)
+		return
+	}
+
+	if g.selectedShip == ShipDouble {
 		g.bullets = append(g.bullets,
 			entities.NewBullet(g.player.CenterX()-15, g.player.Y-12, g.images.Bullet),
 			entities.NewBullet(g.player.CenterX()+15, g.player.Y-12, g.images.Bullet),
@@ -436,8 +485,8 @@ func (g *Game) updatePowerUps() {
 }
 
 func (g *Game) updatePowerUpTimers() {
-	if g.doubleShotTicks > 0 {
-		g.doubleShotTicks--
+	if g.specialShotTicks > 0 {
+		g.specialShotTicks--
 	}
 	if g.shieldTicks > 0 {
 		g.shieldTicks--
@@ -535,14 +584,18 @@ func (g *Game) reset() {
 	g.shootCooldown = 0
 	g.professorShootCooldown = 0
 	g.score = 0
-	g.lives = config.InitialLives
+	if g.selectedShip == ShipDouble {
+		g.lives = 5
+	} else {
+		g.lives = config.InitialLives
+	}
 	g.multiplier = 1
 	g.paused = false
 	g.gameOver = false
 	g.won = false
 	g.professorDefeats = 0
 	g.professorVisits = 0
-	g.doubleShotTicks = 0
+	g.specialShotTicks = 0
 	g.shieldTicks = 0
 	g.penaltyValue = 0
 	g.penaltyTicks = 0
